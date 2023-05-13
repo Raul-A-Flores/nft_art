@@ -1,10 +1,24 @@
 from PIL import Image, ImageDraw, ImageChops
 import random
+import colorsys
 
-
+''' 
 def random_color():
     return (random.randint(0,255),random.randint(0,255),random.randint(0,255))
-
+ '''
+ 
+ 
+def random_color():
+    h = random.random()
+    s = 1 
+    v = 1 
+    
+    float_rgb = colorsys.hsv_to_rgb(h , s , v)
+    rgb = [int(x * 255 ) for x in float_rgb]
+    
+    return tuple(rgb)
+    
+    
 def interpolate( start_color, end_color, factor: float):
     reciprocal = 1 - factor
     return (
@@ -17,14 +31,17 @@ def interpolate( start_color, end_color, factor: float):
 
 def generative_art(path: str):
     print("Generating Art")
-    image_size_h= 128
-    image_size_w = 128
+    target_size_px= 256
+    scale_factor = 2
+    image_size_h = target_size_px * scale_factor
+    image_size_w = target_size_px * scale_factor
+    
     image_color = (0,0,0)
     start_color = random_color()
     end_color = random_color()
     
     thickness = 2
-    padding = 12
+    padding = 12 * scale_factor
     image = Image.new(
         "RGB", 
         size=(image_size_h, image_size_w) , 
@@ -91,13 +108,13 @@ def generative_art(path: str):
         line_xy = (p1,p2)
         color_factor=  i/ n_points
         line_color= interpolate(start_color, end_color, color_factor)
-        thickness += 1
+        thickness += 1 * scale_factor
         overlay_draw.line(line_xy, fill=line_color, width=thickness)
         image = ImageChops.add(image, overlay_image)
         
         
     
-    
+    image = image.resize((target_size_px,target_size_px ))
     image.save(path)
     
   
